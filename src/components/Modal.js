@@ -12,8 +12,8 @@ const center = {
 
 const ModalStyle = {
   bg: "#fff",
-  height: "320px",
-  width: "300px",
+  height: "400px",
+  width: "320px",
   borderRadius: 3,
 };
 
@@ -23,7 +23,7 @@ const CursorWindowStyle = {
   flexDirection: "column",
   m: 2,
   borderRadius: 2,
-  height: "50%",
+  height: "200px",
   bg: "#eee",
 };
 
@@ -102,7 +102,15 @@ const colorPalette = {
   sky: "#00BBFF",
   teal: "#22DDDD",
   green: "#00CC88",
-  gradient1: ["#f00", "#0f0"],
+  yellow: "#FFBB00",
+  orange: "#FF8C00",
+  red: "#FF3366",
+  pink: "#FF579A",
+  purple: "#8957FF",
+  gradient1: ["#FF579A", "#8957FF"],
+  gradient2: ["#00BBFF", "#0066FF"],
+  gradient3: ["#00CC88", "#FFBB00"],
+  gradient4: ["#0066FF", "#0099ff", "#22DDDD"],
 };
 
 const brArray = [24, 16, 8, 0];
@@ -110,10 +118,16 @@ const brArray = [24, 16, 8, 0];
 const NumberContext = React.createContext();
 
 function returnColorType(color) {
-  const isGradient = color.length > 2;
+  const isArray = Array.isArray(color) && color;
+  const isGradient = color.length > 3;
+  const colorStopMap =
+    isArray &&
+    isArray.map((m) => {
+      return `${m}`;
+    });
   return {
     isGradient: isGradient,
-    color: isGradient ? color : `linear-gradient(${color[0]},${color[1]})`,
+    color: isGradient ? color : `linear-gradient(120deg, ${colorStopMap})`,
   };
 }
 
