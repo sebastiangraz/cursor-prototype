@@ -39,7 +39,7 @@ const CursorStyle = {
   minWidth: 7,
   maxWidth: 200,
   minHeight: 6,
-  px: 3,
+  px: 5,
   fontSize: 4,
   mt: "auto",
   outline: "none",
@@ -58,15 +58,8 @@ const ArrowStyle = {
   width: 4,
   top: -3,
   left: -3,
-  maskRepeat: "no-repeat",
-  maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50' %3E%3Cpath d='M 3.469 3.469 L 46.131 14.9 L 14.9 46.131 Z' fill='%2399EEFF' stroke-width='10' stroke='%23f00' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E")`,
   position: "absolute",
-  "& > path": {
-    fill: "#F27734",
-    stroke: "#F27734",
-    strokeLinejoin: "round",
-    strokeWidth: "2px",
-  },
+  transform: "rotate(-45deg)",
 };
 
 const ColorPickerStyle = {
@@ -85,7 +78,7 @@ const ButtonStyle = {
   fontSize: 2,
   bg: "bg",
   height: 5,
-  width: 6,
+  width: 7,
   overflow: "hidden",
   borderRadius: 1,
   textTransform: "capitalize",
@@ -167,12 +160,61 @@ const Br = ({ value }) => {
   );
 };
 
-const Arrow = (rest) => <div {...rest} sx={{ ...ArrowStyle }}></div>;
+const Cursor = ({ bg, br }) => {
+  return (
+    <Flex
+      bg="primary"
+      sx={{
+        ...CursorStyle,
+        background: bg,
+        borderColor: bg,
+        borderRadius: br,
+      }}
+    >
+      <Arrow num={br} color={bg}></Arrow>
+      <span
+        contentEditable
+        sx={{
+          ...LabelStyle,
+        }}
+      >
+        Sebastian
+      </span>
+    </Flex>
+  );
+};
+
+const Arrow = ({ color, num }) => {
+  function br(value) {
+    return value + num / 2;
+  }
+
+  function Arrow() {
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox={`0 0 ${50 + num} ${50 + num}`}
+      >
+        <path
+          d={`M ${br(25)} ${br(0)} L ${br(46.651)} ${br(37.5)} L ${br(
+            3.349
+          )} ${br(37.5)} Z`}
+          fill={color}
+          strokeWidth={num}
+          stroke={color}
+          strokeLinejoin="round"
+        ></path>
+      </svg>
+    );
+  }
+  return <div sx={{ ...ArrowStyle }}>{Arrow()}</div>;
+};
+
+const brArray = [24, 16, 8, 0];
 
 export const Modal = () => {
   const [bg, setBg] = React.useState(colorPalette.ocean);
-  const [br, setBr] = React.useState(99);
-
+  const [br, setBr] = React.useState(25);
   return (
     <NumberContext.Provider value={{ bg: [bg, setBg], br: [br, setBr] }}>
       <Box sx={{ ...ModalStyle }}>
@@ -184,35 +226,11 @@ export const Modal = () => {
           <Text mt={2} sx={{ fontSize: 2, opacity: 0.3 }}>
             Customize your cursor
           </Text>
-          <Flex
-            bg="primary"
-            sx={{
-              ...CursorStyle,
-              background: bg,
-              borderColor: bg,
-              borderRadius: br,
-            }}
-          >
-            <Arrow
-              sx={{
-                background: bg,
-              }}
-            ></Arrow>
-            <span
-              contentEditable
-              sx={{
-                ...LabelStyle,
-              }}
-            >
-              Sebastian
-            </span>
-          </Flex>
+          <Cursor bg={bg} br={br}></Cursor>
           <Flex sx={{ ...ColorPickerStyle }}>
-            <ColorSwatch color={colorPalette.ocean}></ColorSwatch>
-            <ColorSwatch color={colorPalette.blue}></ColorSwatch>
-            <ColorSwatch color={colorPalette.sky}></ColorSwatch>
-            <ColorSwatch color={colorPalette.teal}></ColorSwatch>
-            <ColorSwatch color={colorPalette.green}></ColorSwatch>
+            {Object.values(colorPalette).map((color) => {
+              return <ColorSwatch color={color}></ColorSwatch>;
+            })}
           </Flex>
         </Flex>
         <Flex
@@ -222,10 +240,9 @@ export const Modal = () => {
         >
           <Text mr={3}>Border</Text>
           <Flex>
-            <Br value={"pill"}></Br>
-            <Br value={3}></Br>
-            <Br value={2}></Br>
-            <Br value={0}></Br>
+            {brArray.map((br) => {
+              return <Br value={br}></Br>;
+            })}
           </Flex>
         </Flex>
       </Box>

@@ -13,7 +13,7 @@ const shadow = [
   )()} inset, 0px 1px 1px 0 ${transparentize(colors.text, 0.95)()} inset`,
 ];
 
-const space = [0, 4, 8, 16, 24, 32, 48, 56, 72, 152];
+const space = [0, 4, 8, 16, 24, 32, 40, 48, 56, 72, 152];
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
