@@ -2,7 +2,7 @@
 /** @jsx jsx */
 
 import { jsx, Box, Flex, Text } from "theme-ui";
-import { transparentize } from "@theme-ui/color";
+import { transparentize, darken, lighten, shade } from "@theme-ui/color";
 import React from "react";
 
 const center = {
@@ -70,14 +70,6 @@ const ColorPickerStyle = {
   mb: 2,
 };
 
-const Hover = {
-  transition: "opacity 0.3s ease",
-  "&:hover": {
-    opacity: 0.7,
-    cursor: "pointer",
-  },
-};
-
 const ButtonStyle = {
   fontSize: 2,
   bg: "bg",
@@ -87,7 +79,6 @@ const ButtonStyle = {
   borderRadius: 1,
   textTransform: "capitalize",
   mr: 1,
-  ...Hover,
 };
 
 const OptionRowStyle = {
@@ -103,7 +94,6 @@ const ColorSwatchStyle = {
   mx: "2px",
   borderRadius: "pill",
   background: "#fff",
-  ...Hover,
 };
 
 const colorPalette = {
@@ -112,11 +102,20 @@ const colorPalette = {
   sky: "#00BBFF",
   teal: "#22DDDD",
   green: "#00CC88",
+  gradient1: ["#f00", "#0f0"],
 };
 
 const brArray = [24, 16, 8, 0];
 
 const NumberContext = React.createContext();
+
+function returnColorType(color) {
+  const isGradient = color.length > 2;
+  return {
+    isGradient: isGradient,
+    color: isGradient ? color : `linear-gradient(${color[0]},${color[1]})`,
+  };
+}
 
 const ColorSwatch = ({ color }) => {
   return (
@@ -130,11 +129,13 @@ const ColorSwatch = ({ color }) => {
               ...(isActive && {
                 borderWidth: "2px",
                 borderStyle: "solid",
-                borderColor: color,
+                borderColor: returnColorType(color).isGradient
+                  ? color
+                  : color[0],
                 boxShadow: (t) => `0px 0px 0px 2px ${t.colors.bg} inset`,
               }),
               ...ColorSwatchStyle,
-              bg: color,
+              background: returnColorType(color).color,
             }}
           ></div>
         );
@@ -161,7 +162,7 @@ const Br = ({ value }) => {
                 ...(isActive && {
                   borderWidth: "3px",
                   borderStyle: "solid",
-                  borderColor: bg,
+                  borderColor: returnColorType(bg).isGradient ? bg : bg[0],
                   boxShadow: (t) => `0px 0px 0px 3px ${t.colors.bg} inset`,
                 }),
                 position: "absolute",
@@ -169,7 +170,9 @@ const Br = ({ value }) => {
                 height: 7,
                 top: 2,
                 left: 3,
-                bg: isActive ? bg : transparentize(bg, 0.2),
+                background: isActive
+                  ? returnColorType(bg).color
+                  : returnColorType(bg).color,
                 transformOrigin: "0 0",
                 transform: "scale(0.75)",
                 borderRadius: value,
@@ -187,14 +190,13 @@ const Br = ({ value }) => {
 const Cursor = ({ bg, br }) => {
   const heightArray = [46, 44, 42, 40];
   const ArrowDistanceArray = [-16, -18, -20, -22];
-
   return (
     <Flex
       bg="primary"
       sx={{
         ...CursorStyle,
         height: `${heightArray[brArray.indexOf(br)]}px`,
-        background: bg,
+        background: returnColorType(bg).color,
         borderColor: bg,
         borderRadius: br,
       }}
@@ -234,9 +236,9 @@ const Arrow = ({ color, num, ...rest }) => {
           d={`M ${br(25)} ${br(0)} L ${br(46.651)} ${br(37.5)} L ${br(
             3.349
           )} ${br(37.5)} Z`}
-          fill={color}
+          fill={returnColorType(color).isGradient ? color : color[0]}
           strokeWidth={num}
-          stroke={color}
+          stroke={returnColorType(color).isGradient ? color : color[0]}
           strokeLinejoin="round"
         ></path>
       </svg>
@@ -266,7 +268,7 @@ export const Modal = () => {
           <Cursor bg={bg} br={br}></Cursor>
           <Flex sx={{ ...ColorPickerStyle }}>
             {Object.values(colorPalette).map((color) => {
-              return <ColorSwatch color={color}></ColorSwatch>;
+              return <ColorSwatch key={color} color={color}></ColorSwatch>;
             })}
           </Flex>
         </Flex>
@@ -278,7 +280,7 @@ export const Modal = () => {
           <Text mr={3}>Border</Text>
           <Flex>
             {brArray.map((br) => {
-              return <Br value={br}></Br>;
+              return <Br key={br} value={br}></Br>;
             })}
           </Flex>
         </Flex>
