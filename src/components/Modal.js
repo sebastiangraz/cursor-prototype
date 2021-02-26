@@ -2,6 +2,7 @@
 /** @jsx jsx */
 
 import { jsx, Box, Flex, Text } from "theme-ui";
+import { transparentize } from "@theme-ui/color";
 import React from "react";
 
 const center = {
@@ -36,16 +37,17 @@ const LabelStyle = {
 const CursorStyle = {
   ...center,
   color: "white",
-  minWidth: 7,
+  textAlign: "center",
   maxWidth: 200,
   minHeight: 6,
-  px: 5,
+  px: 4,
   fontSize: 4,
   mt: "auto",
   outline: "none",
   boxSizing: "content-box",
   borderRadius: "pill",
   position: "relative",
+  transition: "background 0.2s ease",
   "&:focus-within": {
     borderWidth: "2px",
     borderStyle: "solid",
@@ -60,6 +62,7 @@ const ArrowStyle = {
   left: -3,
   position: "absolute",
   transform: "rotate(-45deg)",
+  transition: "background 0.2s ease",
 };
 
 const ColorPickerStyle = {
@@ -68,6 +71,7 @@ const ColorPickerStyle = {
 };
 
 const Hover = {
+  transition: "opacity 0.3s ease",
   "&:hover": {
     opacity: 0.7,
     cursor: "pointer",
@@ -110,20 +114,31 @@ const colorPalette = {
   green: "#00CC88",
 };
 
+const brArray = [24, 16, 8, 0];
+
 const NumberContext = React.createContext();
 
 const ColorSwatch = ({ color }) => {
   return (
     <NumberContext.Consumer>
-      {({ bg: [bg, setBg] }) => (
-        <div
-          onClick={() => setBg(color)}
-          sx={{
-            ...ColorSwatchStyle,
-            bg: color,
-          }}
-        ></div>
-      )}
+      {({ bg: [bg, setBg] }) => {
+        const isActive = color === bg;
+        return (
+          <div
+            onClick={() => setBg(color)}
+            sx={{
+              ...(isActive && {
+                borderWidth: "2px",
+                borderStyle: "solid",
+                borderColor: color,
+                boxShadow: (t) => `0px 0px 0px 2px ${t.colors.bg} inset`,
+              }),
+              ...ColorSwatchStyle,
+              bg: color,
+            }}
+          ></div>
+        );
+      }}
     </NumberContext.Consumer>
   );
 };
@@ -131,47 +146,67 @@ const ColorSwatch = ({ color }) => {
 const Br = ({ value }) => {
   return (
     <NumberContext.Consumer>
-      {({ br: [br, setBr], bg: [bg, setBg] }) => (
-        <div
-          onClick={() => setBr(value)}
-          sx={{
-            position: "relative",
-            ...ButtonStyle,
-          }}
-        >
-          <Flex
+      {({ br: [br, setBr], bg: [bg, setBg] }) => {
+        const isActive = value === br;
+        return (
+          <div
+            onClick={() => setBr(value)}
             sx={{
-              position: "absolute",
-              width: "100px",
-              height: 7,
-              top: 2,
-              left: 3,
-              bg: bg,
-              transformOrigin: "0 0",
-              transform: "scale(0.75)",
-              borderRadius: value,
-              maskImage: "linear-gradient(#000, rgba(0,0,0,0.5))",
-              ...center,
+              position: "relative",
+              ...ButtonStyle,
             }}
-          ></Flex>
-        </div>
-      )}
+          >
+            <Flex
+              sx={{
+                ...(isActive && {
+                  borderWidth: "3px",
+                  borderStyle: "solid",
+                  borderColor: bg,
+                  boxShadow: (t) => `0px 0px 0px 3px ${t.colors.bg} inset`,
+                }),
+                position: "absolute",
+                width: "100px",
+                height: 7,
+                top: 2,
+                left: 3,
+                bg: isActive ? bg : transparentize(bg, 0.2),
+                transformOrigin: "0 0",
+                transform: "scale(0.75)",
+                borderRadius: value,
+                maskImage: "linear-gradient(140deg ,#000, rgba(0,0,0,0.5))",
+                ...center,
+              }}
+            ></Flex>
+          </div>
+        );
+      }}
     </NumberContext.Consumer>
   );
 };
 
 const Cursor = ({ bg, br }) => {
+  const heightArray = [46, 44, 42, 40];
+  const ArrowDistanceArray = [-16, -18, -20, -22];
+
   return (
     <Flex
       bg="primary"
       sx={{
         ...CursorStyle,
+        height: `${heightArray[brArray.indexOf(br)]}px`,
         background: bg,
         borderColor: bg,
         borderRadius: br,
       }}
     >
-      <Arrow num={br} color={bg}></Arrow>
+      <Arrow
+        sx={{
+          top: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
+          left: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
+        }}
+        num={br}
+        color={bg}
+      ></Arrow>
       <span
         contentEditable
         sx={{
@@ -184,7 +219,7 @@ const Cursor = ({ bg, br }) => {
   );
 };
 
-const Arrow = ({ color, num }) => {
+const Arrow = ({ color, num, ...rest }) => {
   function br(value) {
     return value + num / 2;
   }
@@ -207,14 +242,16 @@ const Arrow = ({ color, num }) => {
       </svg>
     );
   }
-  return <div sx={{ ...ArrowStyle }}>{Arrow()}</div>;
+  return (
+    <div {...rest} sx={{ ...ArrowStyle }}>
+      {Arrow()}
+    </div>
+  );
 };
-
-const brArray = [24, 16, 8, 0];
 
 export const Modal = () => {
   const [bg, setBg] = React.useState(colorPalette.ocean);
-  const [br, setBr] = React.useState(25);
+  const [br, setBr] = React.useState(brArray[0]);
   return (
     <NumberContext.Provider value={{ bg: [bg, setBg], br: [br, setBr] }}>
       <Box sx={{ ...ModalStyle }}>

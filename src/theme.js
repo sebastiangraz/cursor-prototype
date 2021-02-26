@@ -9,8 +9,8 @@ const colors = {
 const shadow = [
   `1px 2px 4px 0 ${transparentize(
     colors.text,
-    0.95
-  )()} inset, 0px 1px 1px 0 ${transparentize(colors.text, 0.95)()} inset`,
+    0.96
+  )()} inset, 0px 1px 1px 0 ${transparentize(colors.text, 0.98)()} inset`,
 ];
 
 const space = [0, 4, 8, 16, 24, 32, 40, 48, 56, 72, 152];
