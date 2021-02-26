@@ -11,7 +11,7 @@ import {
   rotate,
 } from "@theme-ui/color";
 import React from "react";
-import { framer, apple, instagram } from "../images/";
+import { framer, apple, instagram, arrow, dot, star } from "../images/";
 
 const center = {
   alignItems: "center",
@@ -129,6 +129,13 @@ const teamArray = [
   { name: "framer", img: framer },
   { name: "instagram", img: instagram },
   { name: "apple", img: apple },
+];
+
+const poinerArray = [
+  { img: "none" },
+  { img: star },
+  { img: arrow },
+  { img: dot },
 ];
 
 const NumberContext = React.createContext();
@@ -279,7 +286,68 @@ const Team = ({ value }) => {
   );
 };
 
-const Cursor = ({ bg, br, team }) => {
+const Pointer = ({ value }) => {
+  return (
+    <NumberContext.Consumer>
+      {({ pointer: [pointer, setPointer], bg: [bg, setBg] }) => {
+        const isActive = value === pointer;
+        return (
+          <Flex
+            onClick={() => setPointer(value)}
+            sx={{
+              position: "relative",
+              ...center,
+              ...ButtonStyle,
+            }}
+          >
+            <div>
+              {value.img !== "none" ? (
+                <div>
+                  <div
+                    sx={{
+                      position: "relative",
+                      width: "20px",
+                      height: "20px",
+                      mask: `url("${value.img}")0/100% 100%,
+                          linear-gradient(#fff,#fff)`,
+                      backgroundColor: "#fff",
+                      maskSize: "55%, 100%",
+                      WebkitMaskComposite: isActive
+                        ? "destination-in"
+                        : "destination-out",
+                      maskPosition: "center",
+                      maskRepeat: "no-repeat",
+                      borderRadius: "pill",
+                      zIndex: 1,
+                    }}
+                  ></div>
+                  <div
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "19px",
+                      height: "19px",
+                      content: '""',
+                      background: returnColorType(bg).color,
+                      borderRadius: "pill",
+                      zIndex: 0,
+                    }}
+                  />
+                </div>
+              ) : (
+                <Text sx={{ opacity: 0.7 }}>Arrow</Text>
+              )}
+            </div>
+          </Flex>
+        );
+      }}
+    </NumberContext.Consumer>
+  );
+};
+
+const Cursor = ({ bg, br, team, pointer }) => {
   console.log();
   const heightArray = [46, 44, 42, 40];
   const ArrowDistanceArray = [-16, -18, -20, -22];
@@ -296,14 +364,29 @@ const Cursor = ({ bg, br, team }) => {
         borderRadius: br,
       }}
     >
-      <Arrow
-        sx={{
-          top: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
-          left: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
-        }}
-        num={br}
-        color={bg}
-      ></Arrow>
+      {pointer.img === "none" ? (
+        <Arrow
+          sx={{
+            top: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
+            left: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
+          }}
+          num={br}
+          color={bg}
+        ></Arrow>
+      ) : (
+        <div
+          sx={{
+            mask: `url("${pointer.img}")0/100% 100%`,
+            background: returnColorType(bg).isGradient ? bg : bg[0],
+            height: 4,
+            width: 4,
+            top: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
+            left: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
+            position: "absolute",
+          }}
+        ></div>
+      )}
+
       <span
         contentEditable
         sx={{
@@ -367,12 +450,14 @@ export const Modal = () => {
   const [bg, setBg] = React.useState(colorPalette.ocean);
   const [br, setBr] = React.useState(brArray[0]);
   const [teamBadge, setTeamBadge] = React.useState(teamArray[0]);
+  const [pointer, setPointer] = React.useState(poinerArray[0]);
   return (
     <NumberContext.Provider
       value={{
         bg: [bg, setBg],
         br: [br, setBr],
         teamBadge: [teamBadge, setTeamBadge],
+        pointer: [pointer, setPointer],
       }}
     >
       <Box sx={{ ...ModalStyle }}>
@@ -384,7 +469,7 @@ export const Modal = () => {
           <Text mt={2} sx={{ fontSize: 2, opacity: 0.3 }}>
             Customize your cursor
           </Text>
-          <Cursor bg={bg} br={br} team={teamBadge}></Cursor>
+          <Cursor bg={bg} br={br} team={teamBadge} pointer={pointer}></Cursor>
           <Flex sx={{ ...ColorPickerStyle }}>
             {Object.values(colorPalette).map((color) => {
               return <ColorSwatch key={color} color={color}></ColorSwatch>;
@@ -416,6 +501,20 @@ export const Modal = () => {
           <Flex sx={{ maxWidth: "200px" }}>
             {teamArray.map((team) => {
               return <Team key={team.name} value={team}></Team>;
+            })}
+          </Flex>
+        </Flex>
+        <Flex
+          sx={{
+            ...OptionRowStyle,
+          }}
+        >
+          <Text mr={3} sx={{ fontSize: 2 }}>
+            Pointer
+          </Text>
+          <Flex sx={{ maxWidth: "200px" }}>
+            {poinerArray.map((pointer) => {
+              return <Pointer key={pointer.img} value={pointer}></Pointer>;
             })}
           </Flex>
         </Flex>
