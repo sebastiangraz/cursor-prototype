@@ -2,7 +2,14 @@
 /** @jsx jsx */
 
 import { jsx, Box, Flex, Text } from "theme-ui";
-import { transparentize, darken, lighten, shade } from "@theme-ui/color";
+import {
+  transparentize,
+  darken,
+  lighten,
+  shade,
+  complement,
+  rotate,
+} from "@theme-ui/color";
 import React from "react";
 
 const center = {
@@ -110,7 +117,8 @@ const colorPalette = {
   gradient1: ["#FF579A", "#8957FF"],
   gradient2: ["#00BBFF", "#0066FF"],
   gradient3: ["#00CC88", "#FFBB00"],
-  gradient4: ["#0066FF", "#0099ff", "#22DDDD"],
+  gradient4: ["#FF8C00", "#FF3366", "#FF579A"],
+  gradient5: ["#0099ff", "#22DDDD", "#00CC88", "#FFBB00"],
 };
 
 const brArray = [24, 16, 8, 0];
@@ -119,18 +127,19 @@ const NumberContext = React.createContext();
 
 function returnColorType(color) {
   const isArray = Array.isArray(color) && color;
-  const isGradient = color.length > 3;
+  const isGradient = color.length > 5;
+  const positionArray = ["0% 0%", "100% 0%", "0% 100%", "100% 100%"];
   const colorStopMap =
     isArray &&
-    isArray.map((m) => {
-      return `${m}`;
+    isArray.map((m, i) => {
+      return `radial-gradient(circle at ${positionArray[i]},${m} 0%,transparent 80%)`;
     });
+
   return {
     isGradient: isGradient,
-    color: isGradient ? color : `linear-gradient(120deg, ${colorStopMap})`,
+    color: isGradient ? color : `${colorStopMap}`,
   };
 }
-
 const ColorSwatch = ({ color }) => {
   return (
     <NumberContext.Consumer>
