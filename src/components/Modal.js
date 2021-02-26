@@ -11,6 +11,7 @@ import {
   rotate,
 } from "@theme-ui/color";
 import React from "react";
+import { framer, apple, instagram } from "../images/";
 
 const center = {
   alignItems: "center",
@@ -20,7 +21,7 @@ const center = {
 const ModalStyle = {
   bg: "#fff",
   height: "400px",
-  width: "320px",
+  width: "328px",
   borderRadius: 3,
 };
 
@@ -123,6 +124,13 @@ const colorPalette = {
 
 const brArray = [24, 16, 8, 0];
 
+const teamArray = [
+  { name: "none", img: "" },
+  { name: "framer", img: framer },
+  { name: "instagram", img: instagram },
+  { name: "apple", img: apple },
+];
+
 const NumberContext = React.createContext();
 
 function returnColorType(color) {
@@ -210,14 +218,78 @@ const Br = ({ value }) => {
   );
 };
 
-const Cursor = ({ bg, br }) => {
+const Team = ({ value }) => {
+  return (
+    <NumberContext.Consumer>
+      {({ teamBadge: [teamBadge, setTeamBadge], bg: [bg, setBg] }) => {
+        const isActive = value === teamBadge;
+        return (
+          <Flex
+            onClick={() => setTeamBadge(value)}
+            sx={{
+              position: "relative",
+              ...center,
+              ...ButtonStyle,
+            }}
+          >
+            <div>
+              {value.name !== "none" ? (
+                <div>
+                  <div
+                    sx={{
+                      position: "relative",
+                      width: "20px",
+                      height: "20px",
+                      mask: `url("${value.img}")0/100% 100%,
+                          linear-gradient(#fff,#fff)`,
+                      backgroundColor: "#fff",
+                      maskSize: "55%, 100%",
+                      WebkitMaskComposite: isActive
+                        ? "destination-in"
+                        : "destination-out",
+                      maskPosition: "center",
+                      maskRepeat: "no-repeat",
+                      borderRadius: "pill",
+                      zIndex: 1,
+                    }}
+                  ></div>
+                  <div
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "19px",
+                      height: "19px",
+                      content: '""',
+                      background: returnColorType(bg).color,
+                      borderRadius: "pill",
+                      zIndex: 0,
+                    }}
+                  />
+                </div>
+              ) : (
+                <Text sx={{ opacity: 0.7 }}>None</Text>
+              )}
+            </div>
+          </Flex>
+        );
+      }}
+    </NumberContext.Consumer>
+  );
+};
+
+const Cursor = ({ bg, br, team }) => {
+  console.log();
   const heightArray = [46, 44, 42, 40];
   const ArrowDistanceArray = [-16, -18, -20, -22];
+  const pxValue = [20, 18, 16, 12];
   return (
     <Flex
       bg="primary"
       sx={{
         ...CursorStyle,
+        px: `${pxValue[brArray.indexOf(br)]}px`,
         height: `${heightArray[brArray.indexOf(br)]}px`,
         background: returnColorType(bg).color,
         borderColor: bg,
@@ -240,6 +312,23 @@ const Cursor = ({ bg, br }) => {
       >
         Sebastian
       </span>
+      {team.name !== "none" && (
+        <div
+          sx={{
+            ml: 2,
+            width: "20px",
+            height: "20px",
+            mask: `url("${team.img}")0/100% 100%,
+            linear-gradient(#fff,#fff)`,
+            backgroundColor: "#fff",
+            maskSize: "55%, 100%",
+            WebkitMaskComposite: "destination-out",
+            maskPosition: "center",
+            maskRepeat: "no-repeat",
+            borderRadius: "pill",
+          }}
+        ></div>
+      )}
     </Flex>
   );
 };
@@ -277,8 +366,15 @@ const Arrow = ({ color, num, ...rest }) => {
 export const Modal = () => {
   const [bg, setBg] = React.useState(colorPalette.ocean);
   const [br, setBr] = React.useState(brArray[0]);
+  const [teamBadge, setTeamBadge] = React.useState(teamArray[0]);
   return (
-    <NumberContext.Provider value={{ bg: [bg, setBg], br: [br, setBr] }}>
+    <NumberContext.Provider
+      value={{
+        bg: [bg, setBg],
+        br: [br, setBr],
+        teamBadge: [teamBadge, setTeamBadge],
+      }}
+    >
       <Box sx={{ ...ModalStyle }}>
         <Flex
           sx={{
@@ -288,7 +384,7 @@ export const Modal = () => {
           <Text mt={2} sx={{ fontSize: 2, opacity: 0.3 }}>
             Customize your cursor
           </Text>
-          <Cursor bg={bg} br={br}></Cursor>
+          <Cursor bg={bg} br={br} team={teamBadge}></Cursor>
           <Flex sx={{ ...ColorPickerStyle }}>
             {Object.values(colorPalette).map((color) => {
               return <ColorSwatch key={color} color={color}></ColorSwatch>;
@@ -300,10 +396,26 @@ export const Modal = () => {
             ...OptionRowStyle,
           }}
         >
-          <Text mr={3}>Border</Text>
-          <Flex>
+          <Text mr={3} sx={{ fontSize: 2 }}>
+            Border
+          </Text>
+          <Flex sx={{ maxWidth: "200px" }}>
             {brArray.map((br) => {
               return <Br key={br} value={br}></Br>;
+            })}
+          </Flex>
+        </Flex>
+        <Flex
+          sx={{
+            ...OptionRowStyle,
+          }}
+        >
+          <Text mr={3} sx={{ fontSize: 2 }}>
+            Team Badge
+          </Text>
+          <Flex sx={{ maxWidth: "200px" }}>
+            {teamArray.map((team) => {
+              return <Team key={team.name} value={team}></Team>;
             })}
           </Flex>
         </Flex>
