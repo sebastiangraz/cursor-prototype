@@ -2,27 +2,17 @@
 /** @jsx jsx */
 
 import { jsx, Box, Flex, Text } from "theme-ui";
-import {
-  transparentize,
-  darken,
-  lighten,
-  shade,
-  complement,
-  rotate,
-} from "@theme-ui/color";
 import React from "react";
 import { framer, apple, instagram, arrow, dot, star } from "../images/";
-
-const center = {
-  alignItems: "center",
-  justifyContent: "center",
-};
+import { Cursor } from "../components";
+import { center } from "./globalCSS";
+import { returnColorType } from "./utils";
 
 const ModalStyle = {
   bg: "#fff",
-  height: "400px",
-  width: "328px",
+  width: "356px",
   borderRadius: 3,
+  pb: 3,
 };
 
 const CursorWindowStyle = {
@@ -33,44 +23,6 @@ const CursorWindowStyle = {
   borderRadius: 2,
   height: "200px",
   bg: "#eee",
-};
-
-const LabelStyle = {
-  minWidth: 3,
-  outline: "none",
-  overflow: "hidden",
-  whiteSpace: "pre",
-};
-
-const CursorStyle = {
-  ...center,
-  color: "white",
-  textAlign: "center",
-  maxWidth: 200,
-  minHeight: 6,
-  px: 4,
-  fontSize: 4,
-  mt: "auto",
-  outline: "none",
-  boxSizing: "content-box",
-  borderRadius: "pill",
-  position: "relative",
-  transition: "background 0.2s ease",
-  "&:focus-within": {
-    borderWidth: "2px",
-    borderStyle: "solid",
-    boxShadow: (t) => `0px 0px 0px 2px ${t.colors.bg} inset`,
-  },
-};
-
-const ArrowStyle = {
-  height: 4,
-  width: 4,
-  top: -3,
-  left: -3,
-  position: "absolute",
-  transform: "rotate(-45deg)",
-  transition: "background 0.2s ease",
 };
 
 const ColorPickerStyle = {
@@ -104,6 +56,23 @@ const ColorSwatchStyle = {
   background: "#fff",
 };
 
+const ButtonBadgeStyle = (img, active) => {
+  return {
+    position: "relative",
+    width: "20px",
+    height: "20px",
+    mask: `url("${img}")0/100% 100%,
+      linear-gradient(#fff,#fff)`,
+    backgroundColor: "#fff",
+    maskSize: "55%, 100%",
+    WebkitMaskComposite: active ? "destination-in" : "destination-out",
+    maskPosition: "center",
+    maskRepeat: "no-repeat",
+    borderRadius: "pill",
+    zIndex: 1,
+  };
+};
+
 const colorPalette = {
   ocean: "#0066FF",
   blue: "#0099ff",
@@ -115,6 +84,7 @@ const colorPalette = {
   red: "#FF3366",
   pink: "#FF579A",
   purple: "#8957FF",
+  clem: ["#FFB59E", "#7E008F", "#FFFAE0"],
   gradient1: ["#FF579A", "#8957FF"],
   gradient2: ["#00BBFF", "#0066FF"],
   gradient3: ["#00CC88", "#FFBB00"],
@@ -131,7 +101,7 @@ const teamArray = [
   { name: "apple", img: apple },
 ];
 
-const poinerArray = [
+const pointerArray = [
   { img: "none" },
   { img: star },
   { img: arrow },
@@ -140,21 +110,6 @@ const poinerArray = [
 
 const NumberContext = React.createContext();
 
-function returnColorType(color) {
-  const isArray = Array.isArray(color) && color;
-  const isGradient = color.length > 5;
-  const positionArray = ["0% 0%", "100% 0%", "0% 100%", "100% 100%"];
-  const colorStopMap =
-    isArray &&
-    isArray.map((m, i) => {
-      return `radial-gradient(circle at ${positionArray[i]},${m} 0%,transparent 80%)`;
-    });
-
-  return {
-    isGradient: isGradient,
-    color: isGradient ? color : `${colorStopMap}`,
-  };
-}
 const ColorSwatch = ({ color }) => {
   return (
     <NumberContext.Consumer>
@@ -244,20 +199,7 @@ const Team = ({ value }) => {
                 <div>
                   <div
                     sx={{
-                      position: "relative",
-                      width: "20px",
-                      height: "20px",
-                      mask: `url("${value.img}")0/100% 100%,
-                          linear-gradient(#fff,#fff)`,
-                      backgroundColor: "#fff",
-                      maskSize: "55%, 100%",
-                      WebkitMaskComposite: isActive
-                        ? "destination-in"
-                        : "destination-out",
-                      maskPosition: "center",
-                      maskRepeat: "no-repeat",
-                      borderRadius: "pill",
-                      zIndex: 1,
+                      ...ButtonBadgeStyle(value.img, isActive),
                     }}
                   ></div>
                   <div
@@ -305,20 +247,7 @@ const Pointer = ({ value }) => {
                 <div>
                   <div
                     sx={{
-                      position: "relative",
-                      width: "20px",
-                      height: "20px",
-                      mask: `url("${value.img}")0/100% 100%,
-                          linear-gradient(#fff,#fff)`,
-                      backgroundColor: "#fff",
-                      maskSize: "55%, 100%",
-                      WebkitMaskComposite: isActive
-                        ? "destination-in"
-                        : "destination-out",
-                      maskPosition: "center",
-                      maskRepeat: "no-repeat",
-                      borderRadius: "pill",
-                      zIndex: 1,
+                      ...ButtonBadgeStyle(value.img, isActive),
                     }}
                   ></div>
                   <div
@@ -347,102 +276,18 @@ const Pointer = ({ value }) => {
   );
 };
 
-const Cursor = ({ bg, br, team, pointer }) => {
-  console.log();
-  const heightArray = [46, 44, 42, 40];
-  const ArrowDistanceArray = [-16, -18, -20, -22];
-  const pxValue = [20, 18, 16, 12];
+const OptionRow = ({ array, label, children }) => {
   return (
     <Flex
-      bg="primary"
       sx={{
-        ...CursorStyle,
-        px: `${pxValue[brArray.indexOf(br)]}px`,
-        height: `${heightArray[brArray.indexOf(br)]}px`,
-        background: returnColorType(bg).color,
-        borderColor: bg,
-        borderRadius: br,
+        ...OptionRowStyle,
       }}
     >
-      {pointer.img === "none" ? (
-        <Arrow
-          sx={{
-            top: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
-            left: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
-          }}
-          num={br}
-          color={bg}
-        ></Arrow>
-      ) : (
-        <div
-          sx={{
-            mask: `url("${pointer.img}")0/100% 100%`,
-            background: returnColorType(bg).isGradient ? bg : bg[0],
-            height: 4,
-            width: 4,
-            top: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
-            left: `${ArrowDistanceArray[brArray.indexOf(br)]}px`,
-            position: "absolute",
-          }}
-        ></div>
-      )}
-
-      <span
-        contentEditable
-        sx={{
-          ...LabelStyle,
-        }}
-      >
-        Sebastian
-      </span>
-      {team.name !== "none" && (
-        <div
-          sx={{
-            ml: 2,
-            width: "20px",
-            height: "20px",
-            mask: `url("${team.img}")0/100% 100%,
-            linear-gradient(#fff,#fff)`,
-            backgroundColor: "#fff",
-            maskSize: "55%, 100%",
-            WebkitMaskComposite: "destination-out",
-            maskPosition: "center",
-            maskRepeat: "no-repeat",
-            borderRadius: "pill",
-          }}
-        ></div>
-      )}
+      <Text mr={3} sx={{ fontSize: 2 }}>
+        {label}
+      </Text>
+      <Flex sx={{ maxWidth: "200px" }}>{children}</Flex>
     </Flex>
-  );
-};
-
-const Arrow = ({ color, num, ...rest }) => {
-  function br(value) {
-    return value + num / 2;
-  }
-
-  function Arrow() {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox={`0 0 ${50 + num} ${50 + num}`}
-      >
-        <path
-          d={`M ${br(25)} ${br(0)} L ${br(46.651)} ${br(37.5)} L ${br(
-            3.349
-          )} ${br(37.5)} Z`}
-          fill={returnColorType(color).isGradient ? color : color[0]}
-          strokeWidth={num}
-          stroke={returnColorType(color).isGradient ? color : color[0]}
-          strokeLinejoin="round"
-        ></path>
-      </svg>
-    );
-  }
-  return (
-    <div {...rest} sx={{ ...ArrowStyle }}>
-      {Arrow()}
-    </div>
   );
 };
 
@@ -450,7 +295,8 @@ export const Modal = () => {
   const [bg, setBg] = React.useState(colorPalette.ocean);
   const [br, setBr] = React.useState(brArray[0]);
   const [teamBadge, setTeamBadge] = React.useState(teamArray[0]);
-  const [pointer, setPointer] = React.useState(poinerArray[0]);
+  const [pointer, setPointer] = React.useState(pointerArray[0]);
+
   return (
     <NumberContext.Provider
       value={{
@@ -476,48 +322,21 @@ export const Modal = () => {
             })}
           </Flex>
         </Flex>
-        <Flex
-          sx={{
-            ...OptionRowStyle,
-          }}
-        >
-          <Text mr={3} sx={{ fontSize: 2 }}>
-            Border
-          </Text>
-          <Flex sx={{ maxWidth: "200px" }}>
-            {brArray.map((br) => {
-              return <Br key={br} value={br}></Br>;
-            })}
-          </Flex>
-        </Flex>
-        <Flex
-          sx={{
-            ...OptionRowStyle,
-          }}
-        >
-          <Text mr={3} sx={{ fontSize: 2 }}>
-            Team Badge
-          </Text>
-          <Flex sx={{ maxWidth: "200px" }}>
-            {teamArray.map((team) => {
-              return <Team key={team.name} value={team}></Team>;
-            })}
-          </Flex>
-        </Flex>
-        <Flex
-          sx={{
-            ...OptionRowStyle,
-          }}
-        >
-          <Text mr={3} sx={{ fontSize: 2 }}>
-            Pointer
-          </Text>
-          <Flex sx={{ maxWidth: "200px" }}>
-            {poinerArray.map((pointer) => {
-              return <Pointer key={pointer.img} value={pointer}></Pointer>;
-            })}
-          </Flex>
-        </Flex>
+        <OptionRow label="Team Badge">
+          {brArray.map((br) => {
+            return <Br key={br} value={br}></Br>;
+          })}
+        </OptionRow>
+        <OptionRow label="Team Badge">
+          {teamArray.map((team) => {
+            return <Team key={team.name} value={team}></Team>;
+          })}
+        </OptionRow>
+        <OptionRow label="Pointer">
+          {pointerArray.map((pointer) => {
+            return <Pointer key={pointer.img} value={pointer}></Pointer>;
+          })}
+        </OptionRow>
       </Box>
     </NumberContext.Provider>
   );

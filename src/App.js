@@ -1,14 +1,14 @@
 import "./App.css";
 import { ThemeProvider } from "theme-ui";
 import theme from "./theme";
-import { Cursor, Modal } from "./components";
+import { Base, Modal } from "./components";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Cursor>
+      <Base>
         <Modal></Modal>
-      </Cursor>
+      </Base>
     </ThemeProvider>
   );
 }
