@@ -76,7 +76,6 @@ const Arrow = ({ color, num, ...rest }) => {
 };
 
 export const Cursor = ({ bg, br, team, pointer }) => {
-  console.log(team.img);
   const heightArray = [46, 44, 42, 40];
   const ArrowDistanceArray = [-16, -18, -20, -22];
   const pxValue = [20, 18, 16, 12];
@@ -116,7 +115,6 @@ export const Cursor = ({ bg, br, team, pointer }) => {
       )}
 
       <span
-        contentEditable
         sx={{
           ...LabelStyle,
         }}

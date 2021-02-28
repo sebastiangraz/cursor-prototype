@@ -4,9 +4,11 @@
 import { jsx, Box, Flex, Text } from "theme-ui";
 import React from "react";
 import { framer, apple, instagram, arrow, dot, star } from "../images/";
-import { Cursor } from "../components";
+import { Cursor, AttachCursor } from "../components";
 import { center } from "./globalCSS";
 import { returnColorType } from "./utils";
+
+const NumberContext = React.createContext();
 
 const ModalStyle = {
   bg: "#fff",
@@ -22,7 +24,7 @@ const CursorWindowStyle = {
   m: 2,
   borderRadius: 2,
   height: "200px",
-  bg: "#eee",
+  bg: "bg",
 };
 
 const ColorPickerStyle = {
@@ -107,8 +109,6 @@ const pointerArray = [
   { img: arrow },
   { img: dot },
 ];
-
-const NumberContext = React.createContext();
 
 const ColorSwatch = ({ color }) => {
   return (
@@ -296,6 +296,7 @@ export const Modal = () => {
   const [br, setBr] = React.useState(brArray[0]);
   const [teamBadge, setTeamBadge] = React.useState(teamArray[0]);
   const [pointer, setPointer] = React.useState(pointerArray[0]);
+  const [attachCursor, setAttachCursor] = React.useState(false);
 
   return (
     <NumberContext.Provider
@@ -312,10 +313,26 @@ export const Modal = () => {
             ...CursorWindowStyle,
           }}
         >
-          <Text mt={2} sx={{ fontSize: 2, opacity: 0.3 }}>
+          <Text
+            mt={2}
+            sx={{ fontSize: 2, opacity: 0.3 }}
+            onClick={() => setAttachCursor(!attachCursor)}
+          >
             Customize your cursor
           </Text>
-          <Cursor bg={bg} br={br} team={teamBadge} pointer={pointer}></Cursor>
+          {attachCursor ? (
+            <AttachCursor>
+              <Cursor
+                bg={bg}
+                br={br}
+                team={teamBadge}
+                pointer={pointer}
+              ></Cursor>
+            </AttachCursor>
+          ) : (
+            <Cursor bg={bg} br={br} team={teamBadge} pointer={pointer}></Cursor>
+          )}
+
           <Flex sx={{ ...ColorPickerStyle }}>
             {Object.values(colorPalette).map((color) => {
               return <ColorSwatch key={color} color={color}></ColorSwatch>;
